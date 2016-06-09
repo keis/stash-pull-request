@@ -148,11 +148,26 @@ def main():
 
     data = submit_pull_request(url, auth, pr, args.debug)
 
+    if args.debug:
+        print(json.dumps(data, indent=4, sort_keys=True))
+
     if 'errors' in data:
         for err in data['errors']:
             print(err['message'])
-            if 'existingPullRequest' in err:
-                print(urljoin(url, err['existingPullRequest']['link']['url']))
+            try:
+                epr = err['existingPullRequest']
+            except KeyError:
+                pass
+            else:
+                try:
+                    link = epr['link']
+                except KeyError:
+                    print(epr['links']['self'][0]['href'])
+                else:
+                    print(urljoin(url, link['url']))
+
+    if 'links' in data:
+        print(data['links']['self'][0]['href'])
 
     if 'link' in data:
         print(urljoin(url, data['link']['url']))
