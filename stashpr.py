@@ -43,7 +43,8 @@ def find_username():
 
 
 def find_description(frm, to):
-    return to
+    to = to if '/' in to else 'origin/%s' % to
+    return execute(['git', 'show', '-s', '--format=%B', '%s...%s' % (frm, to)])
 
 
 def find_project():
@@ -51,6 +52,7 @@ def find_project():
 
 
 class PullRequest(object):
+
     def __init__(self, project, repository, onto, branch, state,
                  title=None, description=None, reviewers=None):
         self.project = project
@@ -59,7 +61,7 @@ class PullRequest(object):
         self.branch = branch
         self.state = state
         self.title = title or re.sub('^refs/heads/', '', branch)
-        self.description = description or find_description(onto, branch)
+        self.description = description or find_description('HEAD', onto)
         self.reviewers = reviewers or []
 
 
