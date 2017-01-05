@@ -61,7 +61,7 @@ class PullRequest(object):
         self.branch = branch
         self.state = state
         self.title = title or re.sub('^refs/heads/', '', branch)
-        self.description = description or find_description(branch, onto)
+        self.description = description
         self.reviewers = reviewers or []
 
 
@@ -134,6 +134,8 @@ def main():
     project = args.project or find_project()
     branch = args.branch or find_branch()
     reviewers = args.reviewer or args.reviewers
+    upstream = 'origin/' + args.on_to
+    description = args.description or find_description(branch, upstream)
 
     pr = PullRequest(project=project,
                      repository=repository,
@@ -141,7 +143,7 @@ def main():
                      branch=branch,
                      state=OPEN,
                      title=args.title,
-                     description=args.description,
+                     description=description,
                      reviewers=reviewers)
 
     username = args.username or find_username()
